@@ -20,31 +20,28 @@
       height: 297mm;
       background: white;
       margin: 0 auto;
-      padding: 6mm 8mm;
+      padding: 6mm 6mm;
       box-sizing: border-box;
       box-shadow: 0 0 15px rgba(0,0,0,0.15);
     }
 
     /* Layout Alignment Rules */
     .layout-center { display: flex; justify-content: center; align-items: flex-start; gap: 5mm; width: 100%; }
-    .layout-left-to-right { display: flex; justify-content: flex-start; align-items: flex-start; gap: 4mm; width: 100%; flex-wrap: nowrap; }
+    .layout-left-to-right { display: flex; justify-content: flex-start; align-items: flex-start; gap: 2.5mm; width: 100%; flex-wrap: wrap; }
 
     /* Single Passport Sizes (Photoshop 1.5 in x 1.9 in = 38.1mm x 48.26mm) */
-    .img-pp-normal { width: 38.1mm; height: 48.26mm; object-fit: contain; border: 1px solid #000; box-sizing: border-box; }
+    .img-pp-normal { width: 38.1mm; height: 48.26mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; }
     
-    /* 4 Pic Rotated (48.26mm x 38.1mm) */
-    .img-pp-rotated-4 { width: 44.5mm; height: 35.1mm; object-fit: contain; border: 1px solid #000; box-sizing: border-box; flex-shrink: 0; }
-    
-    /* 5 Pic Rotated (Slightly compact for 5 items) */
-    .img-pp-rotated-5 { width: 35.5mm; height: 28.0mm; object-fit: contain; border: 1px solid #000; box-sizing: border-box; flex-shrink: 0; }
+    /* 4 Pic Rotated (আপনার আগের পারফেক্ট সাইজ) */
+    .img-pp-rotated-4 { width: 44.5mm; height: 38.1mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; flex-shrink: 0; }
 
     /* Double Passport Sizes */
-    .img-double-normal { width: 48.26mm; height: 38.1mm; object-fit: contain; border: 1px solid #000; box-sizing: border-box; }
-    .img-double-rotated { width: 35.5mm; height: 45.0mm; object-fit: contain; border: 1px solid #000; box-sizing: border-box; flex-shrink: 0; }
+    .img-double-normal { width: 48.26mm; height: 38.1mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; }
+    .img-double-rotated { width: 36.5mm; height: 48.26mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; flex-shrink: 0; }
 
     /* Stamp Passport Sizes */
-    .img-stamp-normal { width: 38.1mm; height: 38.1mm; object-fit: contain; border: 1px solid #000; box-sizing: border-box; }
-    .img-stamp-rotated { width: 35.5mm; height: 35.5mm; object-fit: contain; border: 1px solid #000; box-sizing: border-box; flex-shrink: 0; }
+    .img-stamp-normal { width: 38.1mm; height: 38.1mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; }
+    .img-stamp-rotated { width: 38.1mm; height: 38.1mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; flex-shrink: 0; }
 
     @media print {
       @page {
@@ -53,7 +50,7 @@
       }
       body { background: white; padding: 0; margin: 0; }
       .controls { display: none !important; }
-      #print-area { box-shadow: none; margin: 0; padding: 6mm 8mm; width: 210mm; height: 297mm; page-break-after: avoid; }
+      #print-area { box-shadow: none; margin: 0; padding: 6mm 6mm; width: 210mm; height: 297mm; page-break-after: avoid; }
     }
   </style>
 </head>
@@ -124,10 +121,10 @@
             if (ppCount === 1 || ppCount === 2) {
               renderCenter(imgSrc, ppCount, 'img-pp-normal');
             } else if (ppCount === 4) {
+              /* ৪টি ছবি হলে ঘুড়ে যাবে (আপনার পারফেক্ট সেটিংস) */
               renderLeftToRight(rotatedImgSrc, 4, 'img-pp-rotated-4');
-            } else if (ppCount === 5) {
-              renderLeftToRight(rotatedImgSrc, 5, 'img-pp-rotated-5');
             } else {
+              /* ৫টি বা অন্য যেকোনো সংখ্যার ছবি হলে সোজা (Normal) থাকবে, ঘুরবে না */
               renderLeftToRight(imgSrc, ppCount, 'img-pp-normal');
             }
           }
