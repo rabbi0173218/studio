@@ -31,7 +31,7 @@
 
     /* Single Passport Sizes (Photoshop 1.5 in x 1.9 in) */
     .img-pp-normal { width: 38.1mm; height: 48.26mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; }
-    .img-pp-rotated { width: 44.5mm; height: 38.1mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; flex-shrink: 0; }
+    .img-pp-rotated { width: 36.5mm; height: 38.1mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; flex-shrink: 0; }
 
     /* Double Passport Sizes (Photoshop 1.9 in x 1.5 in) */
     .img-double-normal { width: 48.26mm; height: 38.1mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; }
@@ -73,7 +73,7 @@
 
     <div class="input-group">
       <label>কয়টি ছবি চান (সংখ্যা বসান):</label>
-      <input type="number" id="ppCount" value="4" min="1">
+      <input type="number" id="ppCount" value="5" min="1">
     </div>
 
     <div class="btn-group">
@@ -118,8 +118,9 @@
           if (photoType === 'single') {
             if (ppCount === 1 || ppCount === 2) {
               renderCenter(imgSrc, ppCount, 'img-pp-normal');
-            } else if (ppCount === 4) {
-              renderLeftToRight(rotatedImgSrc, 4, 'img-pp-rotated');
+            } else if (ppCount === 4 || ppCount === 5) {
+              /* ৪ বা ৫টি ছবি হলে ৯০ ডিগ্রি ঘুরে যাবে */
+              renderLeftToRight(rotatedImgSrc, ppCount, 'img-pp-rotated');
             } else {
               renderLeftToRight(imgSrc, ppCount, 'img-pp-normal');
             }
@@ -128,7 +129,6 @@
             if (ppCount === 1 || ppCount === 2) {
               renderCenter(imgSrc, ppCount, 'img-double-normal');
             } else if (ppCount >= 4) {
-              /* জোড়া ছবি ৪ বা ৫টি হলে ঘুরিয়ে (Rotate করে) বসানো হবে */
               renderLeftToRight(rotatedImgSrc, ppCount, 'img-double-rotated');
             } else {
               renderLeftToRight(imgSrc, ppCount, 'img-double-normal');
@@ -137,8 +137,8 @@
           else if (photoType === 'stamp') {
             if (ppCount === 1 || ppCount === 2) {
               renderCenter(imgSrc, ppCount, 'img-stamp-normal');
-            } else if (ppCount === 4) {
-              renderLeftToRight(rotatedImgSrc, 4, 'img-stamp-rotated');
+            } else if (ppCount === 4 || ppCount === 5) {
+              renderLeftToRight(rotatedImgSrc, ppCount, 'img-stamp-rotated');
             } else {
               renderLeftToRight(imgSrc, ppCount, 'img-stamp-normal');
             }
