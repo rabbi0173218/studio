@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Paper Saver Studio</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; padding: 15px; background: #eef2f5; margin: 0; }
+    .controls { background: white; padding: 20px; border-radius: 12px; max-width: 500px; margin: 0 auto 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .input-group { margin-bottom: 15px; }
+    label { font-weight: 600; display: block; margin-bottom: 6px; color: #333; }
+    input[type="number"], input[type="file"], select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
+    .btn-group { display: flex; gap: 10px; }
+    button { background: #0066ff; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; flex: 1; }
+    .btn-print { background: #28a745; }
+    
+    /* A4 Sheet Print Setup */
+    #print-area {
+      width: 210mm;
+      height: 297mm;
+      background: white;
+      margin: 0 auto;
+      padding: 8mm;
+      box-sizing: border-box;
+      box-shadow: 0 0 15px rgba(0,0,0,0.15);
+      position: relative;
+    }
+
+    /* Layout Alignment Rules */
+    .layout-center { display: flex; justify-content: center; align-items: flex-start; gap: 5mm; width: 100%; }
+    .layout-left-to-right { display: flex; justify-content: flex-start; align-items: flex-start; gap: 4mm; width: 100%; flex-wrap: wrap; }
+
+    /* Single Passport (300 DPI: 40mm x 50mm) */
+    .img-pp-normal { width: 40mm; height: 50mm; object-fit: cover; border: 1px dashed #ccc; }
+    .img-pp-rotated { width: 50mm; height: 40mm; object-fit: cover; border: 1px dashed #ccc; }
+
+    /* Double Passport */
+    .img-double-normal { width: 80mm; height: 50mm; object-fit: cover; border: 1px dashed #ccc; }
+    .img-double-rotated { width: 50mm; height: 80mm; object-fit: cover; border: 1px dashed #ccc; }
+
+    /* Stamp Passport (150 DPI: 1.5in x 1.9in equivalent -> 38.1mm x 48.26mm) */
+    .img-stamp-normal { width: 38.1mm; height: 48.26mm; object-fit: cover; border: 1px dashed #ccc; }
+    .img-stamp-rotated { width: 48.26mm; height: 38.1mm; object-fit: cover; border: 1px dashed #ccc; }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .controls { display: none; }
+      #print-area { box-shadow: none; margin: 0; width: 210mm; height: 297mm; page-break-after: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="controls">
+    <h2 style="margin-top:0; color: #111; text-align:center;">স্মার্ট পেপার সেভার স্টুডিও</h2>
+    
+    <div class="input-group">
+      <label>ছবি আপলোড করুন:</label>
+      <input type="file" id="imageInput" accept="image/*">
+    </div>
+
+    <div class="input-group">
+      <label>কাজের ধরন নির্বাচন করুন:</label>
+      <select id="photoType">
+        <option value="single">সিঙ্গেল পাসপোর্ট (Single Passport)</option>
+        <option value="double">জোড়া পাসপোর্ট (Double Passport)</option>
+        <option value="stamp">স্ট্যাম্প পাসপোর্ট (Stamp Passport - 150 DPI)</option>
+      </select>
+    </div>
+
+    <div class="input-group">
+      <label>কয়টি ছবি চান (সংখ্যা বসান):</label>
+      <input type="number" id="ppCount" value="2" min="1">
+    </div>
+
+    <div class="btn-group">
+      <button onclick="generateGrid()">লেআউট তৈরি করুন</button>
+      <button onclick="window.print()" class="btn-print">প্রিন্ট দিন</button>
+    </div>
+  </div>
+
+  <!-- A4 Sheet Preview -->
+  <div id="print-area"></div>
+
+  <script>
+    function generateGrid() {
+      const fileInput = document.getElementById('imageInput');
+      const photoType = document.getElementById('photoType').value;
+      const ppCount = parseInt(document.getElementById('ppCount').value) || 0;
+      const printArea = document.getElementById('print-area');
+      
+      printArea.innerHTML = '';
+
+      if (!fileInput.files[0]) {
+        alert('দয়া করে একটি ছবি সিলেক্ট করুন!');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const imgSrc = e.target.result;
+        const tempImg = new Image();
+        tempImg.src = imgSrc;
+
+        tempImg.onload = function() {
+          // 90 Degree Rotation Canvas
+          const canvas = document.createElement('canvas');
+          canvas.width = tempImg.height;
+          canvas.height = tempImg.width;
+          const ctx = canvas.getContext('2d');
+          ctx.translate(canvas.width / 2, canvas.height / 2);
+          ctx.rotate(90 * Math.PI / 180);
+          ctx.drawImage(tempImg, -tempImg.width / 2, -tempImg.height / 2);
+          const rotatedImgSrc = canvas.toDataURL();
+
+          // --------------------------------------------------
+          // 1. SINGLE PASSPORT LOGIC
+          // --------------------------------------------------
+          if (photoType === 'single') {
+            if (ppCount === 1 || ppCount === 2) {
+              renderCenter(imgSrc, ppCount, 'img-pp-normal');
+            } else if (ppCount === 4) {
+              renderLeftToRight(rotatedImgSrc, 4, 'img-pp-rotated');
+            } else {
+              renderLeftToRight(imgSrc, ppCount, 'img-pp-normal');
+            }
+          }
+
+          // --------------------------------------------------
+          // 2. DOUBLE PASSPORT LOGIC
+          // --------------------------------------------------
+          else if (photoType === 'double') {
+            if (ppCount === 1 || ppCount === 2) {
+              renderCenter(imgSrc, ppCount, 'img-double-normal');
+            } else if (ppCount === 4) {
+              renderLeftToRight(imgSrc, 4, 'img-double-normal');
+            } else if (ppCount === 5) {
+              renderLeftToRight(rotatedImgSrc, 5, 'img-double-rotated');
+            } else {
+              renderLeftToRight(imgSrc, ppCount, 'img-double-normal');
+            }
+          }
+
+          // --------------------------------------------------
+          // 3. STAMP PASSPORT LOGIC (1.5" x 1.9", 150 DPI)
+          // --------------------------------------------------
+          else if (photoType === 'stamp') {
+            if (ppCount === 1 || ppCount === 2) {
+              renderCenter(imgSrc, ppCount, 'img-stamp-normal');
+            } else if (ppCount === 4) {
+              renderLeftToRight(rotatedImgSrc, 4, 'img-stamp-rotated');
+            } else {
+              renderLeftToRight(imgSrc, ppCount, 'img-stamp-normal');
+            }
+          }
+
+        };
+      };
+      reader.readAsDataURL(fileInput.files[0]);
+    }
+
+    // Top-Center Helper Function for 1 or 2 photos
+    function renderCenter(src, count, className) {
+      const printArea = document.getElementById('print-area');
+      const container = document.createElement('div');
+      container.className = 'layout-center';
+      for (let i = 0; i < count; i++) {
+        const img = document.createElement('img');
+        img.src = src;
+        img.className = className;
+        container.appendChild(img);
+      }
+      printArea.appendChild(container);
+    }
+
+    // Left-to-Right Helper Function
+    function renderLeftToRight(src, count, className) {
+      const printArea = document.getElementById('print-area');
+      const container = document.createElement('div');
+      container.className = 'layout-left-to-right';
+      for (let i = 0; i < count; i++) {
+        const img = document.createElement('img');
+        img.src = src;
+        img.className = className;
+        container.appendChild(img);
+      }
+      printArea.appendChild(container);
+    }
+  </script>
+</body>
+</html>
