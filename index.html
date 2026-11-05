@@ -26,20 +26,20 @@
     }
 
     /* Layout Alignment Rules */
-    .layout-center { display: flex; justify-content: center; align-items: flex-start; gap: 3mm; width: 100%; }
-    .layout-left-to-right { display: flex; justify-content: flex-start; align-items: flex-start; gap: 2mm; width: 100%; flex-wrap: nowrap; }
+    .layout-center { display: flex; justify-content: center; align-items: flex-start; gap: 4mm; width: 100%; }
+    .layout-left-to-right { display: flex; justify-content: flex-start; align-items: flex-start; gap: 2.5mm; width: 100%; flex-wrap: nowrap; }
 
-    /* Standard Passport Sizes (Photoshop 1.5 in x 1.9 in = 38.1mm x 48.26mm) */
-    .img-pp-normal { width: 38.1mm; height: 48.26mm; object-fit: cover; border: 1px dashed #bbb; }
-    .img-pp-rotated { width: 48.26mm; height: 38.1mm; object-fit: cover; border: 1px dashed #bbb; flex-shrink: 0; }
+    /* Standard Passport Sizes with Black Border */
+    .img-pp-normal { width: 38.1mm; height: 48.26mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; }
+    .img-pp-rotated { width: 47.5mm; height: 38.1mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; flex-shrink: 0; }
 
     /* Double Passport Sizes */
-    .img-double-normal { width: 76.2mm; height: 48.26mm; object-fit: cover; border: 1px dashed #bbb; }
-    .img-double-rotated { width: 48.26mm; height: 76.2mm; object-fit: cover; border: 1px dashed #bbb; flex-shrink: 0; }
+    .img-double-normal { width: 76.2mm; height: 48.26mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; }
+    .img-double-rotated { width: 47.5mm; height: 76.2mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; flex-shrink: 0; }
 
-    /* Stamp Passport Sizes (1.5 in x 1.5 in) */
-    .img-stamp-normal { width: 38.1mm; height: 38.1mm; object-fit: cover; border: 1px dashed #bbb; }
-    .img-stamp-rotated { width: 38.1mm; height: 38.1mm; object-fit: cover; border: 1px dashed #bbb; flex-shrink: 0; }
+    /* Stamp Passport Sizes */
+    .img-stamp-normal { width: 38.1mm; height: 38.1mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; }
+    .img-stamp-rotated { width: 38.1mm; height: 38.1mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; flex-shrink: 0; }
 
     @media print {
       @page {
