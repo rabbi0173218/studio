@@ -14,34 +14,35 @@
     button { background: #0066ff; color: white; border: none; padding: 10px; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; flex: 1; }
     .btn-print { background: #28a745; }
     
-    /* A4 Sheet Print Setup (Top: 6mm, Left/Right: 3mm for 100% Photoshop accuracy) */
+    /* Base A4 Setup */
     #print-area {
       width: 210mm;
       height: 297mm;
       background: white;
       margin: 0 auto;
-      padding: 6mm 3mm;
       box-sizing: border-box;
       box-shadow: 0 0 15px rgba(0,0,0,0.15);
     }
 
-    /* Layout Alignment Rules (3.5mm Gap Between Photos) */
-    .layout-center { display: flex; justify-content: center; align-items: flex-start; gap: 3.5mm; width: 100%; }
-    .layout-left-to-right { display: flex; justify-content: flex-start; align-items: flex-start; gap: 3.5mm; width: 100%; flex-wrap: wrap; }
+    /* Padding Variations Based on Selected Option */
+    .pad-standard { padding: 6mm 6.2mm; }
+    .pad-5pic { padding: 6mm 2.2mm; }
 
-    /* Single Passport Photoshop Exact Sizes (1.5 in x 1.9 in = 38.1mm x 48.26mm) */
-    .img-pp-normal { width: 38.1mm; height: 48.26mm; object-fit: cover; border: 2px solid #000; box-sizing: border-box; }
-    
-    /* 4 Pic Rotated (Exact 48.26mm x 38.1mm with 2px border) */
+    /* Layout Alignment Rules */
+    .layout-center { display: flex; justify-content: center; align-items: flex-start; gap: 3.5mm; width: 100%; }
+    .layout-left-to-right { display: flex; justify-content: flex-start; align-items: flex-start; gap: 3.5mm; width: 100%; flex-wrap: nowrap; }
+    .layout-gap-5 { display: flex; justify-content: flex-start; align-items: flex-start; gap: 1.2mm; width: 100%; flex-wrap: nowrap; }
+
+    /* Photoshop Exact Sizes (1.5 in x 1.9 in = 38.1mm x 48.26mm) */
+    .img-pp-normal { width: 38.1mm; height: 48.26mm; object-fit: cover; border: 2px solid #000; box-sizing: border-box; flex-shrink: 0; }
     .img-pp-rotated-exact { width: 48.26mm; height: 38.1mm; object-fit: cover; border: 2px solid #000; box-sizing: border-box; flex-shrink: 0; }
 
     /* Double Passport Sizes */
-    .img-double-normal { width: 48.26mm; height: 38.1mm; object-fit: cover; border: 2px solid #000; box-sizing: border-box; }
+    .img-double-normal { width: 48.26mm; height: 38.1mm; object-fit: cover; border: 2px solid #000; box-sizing: border-box; flex-shrink: 0; }
     .img-double-rotated { width: 38.1mm; height: 48.26mm; object-fit: cover; border: 2px solid #000; box-sizing: border-box; flex-shrink: 0; }
 
     /* Stamp Passport Sizes */
-    .img-stamp-normal { width: 38.1mm; height: 38.1mm; object-fit: cover; border: 2px solid #000; box-sizing: border-box; }
-    .img-stamp-rotated { width: 38.1mm; height: 38.1mm; object-fit: cover; border: 2px solid #000; box-sizing: border-box; flex-shrink: 0; }
+    .img-stamp-normal { width: 38.1mm; height: 38.1mm; object-fit: cover; border: 2px solid #000; box-sizing: border-box; flex-shrink: 0; }
 
     @media print {
       @page {
@@ -50,7 +51,7 @@
       }
       body { background: white; padding: 0; margin: 0; }
       .controls { display: none !important; }
-      #print-area { box-shadow: none; margin: 0; padding: 6mm 3mm; width: 210mm; height: 297mm; page-break-after: avoid; }
+      #print-area { box-shadow: none; margin: 0; width: 210mm; height: 297mm; page-break-after: avoid; }
     }
   </style>
 </head>
@@ -74,7 +75,18 @@
     </div>
 
     <div class="input-group">
-      <label>কয়টি ছবি চান (সংখ্যা বসান):</label>
+      <label>কয়টি ছবি চান (লেআউট নির্বাচন করুন):</label>
+      <select id="layoutPreset">
+        <option value="1">১টি ছবি (মাঝখানে)</option>
+        <option value="2">২টি ছবি (মাঝখানে)</option>
+        <option value="4">৪টি ছবি (১ সারি - ঘোরানো)</option>
+        <option value="5">৫টি ছবি (১ সারি - সোজা)</option>
+        <option value="custom">কাস্টম সংখ্যা (নিচে বসান)</option>
+      </select>
+    </div>
+
+    <div class="input-group" id="customCountGroup" style="display: none;">
+      <label>কাস্টম সংখ্যা বসান:</label>
       <input type="number" id="ppCount" value="4" min="1">
     </div>
 
@@ -85,16 +97,38 @@
   </div>
 
   <!-- A4 Sheet Preview -->
-  <div id="print-area"></div>
+  <div id="print-area" class="pad-standard"></div>
 
   <script>
+    // Toggle custom input field
+    document.getElementById('layoutPreset').addEventListener('change', function() {
+      const customGroup = document.getElementById('customCountGroup');
+      if (this.value === 'custom') {
+        customGroup.style.display = 'block';
+      } else {
+        customGroup.style.display = 'none';
+      }
+    });
+
     function generateGrid() {
       const fileInput = document.getElementById('imageInput');
       const photoType = document.getElementById('photoType').value;
-      const ppCount = parseInt(document.getElementById('ppCount').value) || 0;
-      const printArea = document.getElementById('print-area');
+      const preset = document.getElementById('layoutPreset').value;
+      let ppCount = parseInt(preset);
       
+      if (preset === 'custom') {
+        ppCount = parseInt(document.getElementById('ppCount').value) || 0;
+      }
+
+      const printArea = document.getElementById('print-area');
       printArea.innerHTML = '';
+      
+      // Set Print Area Padding
+      if (preset === '5' && photoType === 'single') {
+        printArea.className = 'pad-5pic';
+      } else {
+        printArea.className = 'pad-standard';
+      }
 
       if (!fileInput.files[0]) {
         alert('দয়া করে একটি ছবি সিলেক্ট করুন!');
@@ -118,17 +152,18 @@
           const rotatedImgSrc = canvas.toDataURL();
 
           if (photoType === 'single') {
-            if (ppCount === 1 || ppCount === 2) {
+            if (preset === '1' || preset === '2') {
               renderCenter(imgSrc, ppCount, 'img-pp-normal');
-            } else if (ppCount >= 4) {
-              /* ৪টি বা তার বেশি ছবি হলে অরিজিনাল ৪৮.২৬ মিমি x ৩৮.১ মিমি সাইজে ঘুরে বসবে */
-              renderLeftToRight(rotatedImgSrc, ppCount, 'img-pp-rotated-exact');
+            } else if (preset === '4') {
+              renderLeftToRight(rotatedImgSrc, 4, 'img-pp-rotated-exact');
+            } else if (preset === '5') {
+              renderGap5(imgSrc, 5, 'img-pp-normal');
             } else {
               renderLeftToRight(imgSrc, ppCount, 'img-pp-normal');
             }
           }
           else if (photoType === 'double') {
-            if (ppCount === 1 || ppCount === 2) {
+            if (preset === '1' || preset === '2') {
               renderCenter(imgSrc, ppCount, 'img-double-normal');
             } else if (ppCount >= 4) {
               renderLeftToRight(rotatedImgSrc, ppCount, 'img-double-rotated');
@@ -137,10 +172,8 @@
             }
           }
           else if (photoType === 'stamp') {
-            if (ppCount === 1 || ppCount === 2) {
+            if (preset === '1' || preset === '2') {
               renderCenter(imgSrc, ppCount, 'img-stamp-normal');
-            } else if (ppCount >= 4) {
-              renderLeftToRight(rotatedImgSrc, ppCount, 'img-stamp-rotated');
             } else {
               renderLeftToRight(imgSrc, ppCount, 'img-stamp-normal');
             }
@@ -167,6 +200,19 @@
       const printArea = document.getElementById('print-area');
       const container = document.createElement('div');
       container.className = 'layout-left-to-right';
+      for (let i = 0; i < count; i++) {
+        const img = document.createElement('img');
+        img.src = src;
+        img.className = className;
+        container.appendChild(img);
+      }
+      printArea.appendChild(container);
+    }
+
+    function renderGap5(src, count, className) {
+      const printArea = document.getElementById('print-area');
+      const container = document.createElement('div');
+      container.className = 'layout-gap-5';
       for (let i = 0; i < count; i++) {
         const img = document.createElement('img');
         img.src = src;
