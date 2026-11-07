@@ -14,34 +14,38 @@
     button { background: #0066ff; color: white; border: none; padding: 10px; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; flex: 1; }
     .btn-print { background: #28a745; }
     
-    /* A4 Sheet Print Setup (Top: 5mm, Left/Right: 6.2mm) */
+    /* A4 Sheet Print Setup (Top: 6mm, Left/Right: 6.2mm) */
     #print-area {
       width: 210mm;
       height: 297mm;
       background: white;
       margin: 0 auto;
-      padding: 5mm 6.2mm;
+      padding: 6mm 6.2mm;
       box-sizing: border-box;
       box-shadow: 0 0 15px rgba(0,0,0,0.15);
     }
 
-    /* Layout Alignment Rules (3.5mm Gap Between Photos) */
+    /* Layout Alignment Rules */
     .layout-center { display: flex; justify-content: center; align-items: flex-start; gap: 3.5mm; width: 100%; }
     .layout-left-to-right { display: flex; justify-content: flex-start; align-items: flex-start; gap: 3.5mm; width: 100%; flex-wrap: nowrap; }
+    .layout-gap-5 { display: flex; justify-content: flex-start; align-items: flex-start; gap: 2.2mm; width: 100%; flex-wrap: nowrap; }
 
-    /* Single Passport Sizes (Photoshop 1.5 in x 1.9 in = 38.1mm x 48.26mm) */
-    .img-pp-normal { width: 38.1mm; height: 48.26mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; }
+    /* Single Passport Sizes (Photoshop 1.5 in x 1.9 in = 38.1mm x 48.26mm, Border: 2px) */
+    .img-pp-normal { width: 38.1mm; height: 48.26mm; object-fit: cover; border: 2px solid #000; box-sizing: border-box; }
     
-    /* 4 Pic Rotated with 3.5mm Spacing & Solid Black Border */
-    .img-pp-rotated-4 { width: 46.2mm; height: 38.1mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; flex-shrink: 0; }
+    /* 4 Pic Rotated (আপনার আগের পারফেক্ট সেটিংস - অটুট রাখা হলো) */
+    .img-pp-rotated-4 { width: 45.8mm; height: 38.1mm; object-fit: cover; border: 2px solid #000; box-sizing: border-box; flex-shrink: 0; }
+
+    /* 5 Pic Normal (A4 পেজের ভেতরে নিখুঁতভাবে আঁটার জন্য) */
+    .img-pp-5-normal { width: 36.5mm; height: 46.2mm; object-fit: cover; border: 2px solid #000; box-sizing: border-box; flex-shrink: 0; }
 
     /* Double Passport Sizes */
-    .img-double-normal { width: 48.26mm; height: 38.1mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; }
-    .img-double-rotated { width: 36.5mm; height: 48.26mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; flex-shrink: 0; }
+    .img-double-normal { width: 48.26mm; height: 38.1mm; object-fit: cover; border: 2px solid #000; box-sizing: border-box; }
+    .img-double-rotated { width: 36.5mm; height: 48.26mm; object-fit: cover; border: 2px solid #000; box-sizing: border-box; flex-shrink: 0; }
 
     /* Stamp Passport Sizes */
-    .img-stamp-normal { width: 38.1mm; height: 38.1mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; }
-    .img-stamp-rotated { width: 38.1mm; height: 38.1mm; object-fit: cover; border: 1px solid #000; box-sizing: border-box; flex-shrink: 0; }
+    .img-stamp-normal { width: 38.1mm; height: 38.1mm; object-fit: cover; border: 2px solid #000; box-sizing: border-box; }
+    .img-stamp-rotated { width: 38.1mm; height: 38.1mm; object-fit: cover; border: 2px solid #000; box-sizing: border-box; flex-shrink: 0; }
 
     @media print {
       @page {
@@ -50,7 +54,7 @@
       }
       body { background: white; padding: 0; margin: 0; }
       .controls { display: none !important; }
-      #print-area { box-shadow: none; margin: 0; padding: 5mm 6.2mm; width: 210mm; height: 297mm; page-break-after: avoid; }
+      #print-area { box-shadow: none; margin: 0; padding: 6mm 6.2mm; width: 210mm; height: 297mm; page-break-after: avoid; }
     }
   </style>
 </head>
@@ -122,6 +126,9 @@
               renderCenter(imgSrc, ppCount, 'img-pp-normal');
             } else if (ppCount === 4) {
               renderLeftToRight(rotatedImgSrc, 4, 'img-pp-rotated-4');
+            } else if (ppCount === 5) {
+              /* ৫টি ছবির জন্য বিশেষ এলাইনমেন্ট ও ২.২মিমি গ্যাপ */
+              renderGap5(imgSrc, 5, 'img-pp-5-normal');
             } else {
               renderLeftToRight(imgSrc, ppCount, 'img-pp-normal');
             }
@@ -166,6 +173,19 @@
       const printArea = document.getElementById('print-area');
       const container = document.createElement('div');
       container.className = 'layout-left-to-right';
+      for (let i = 0; i < count; i++) {
+        const img = document.createElement('img');
+        img.src = src;
+        img.className = className;
+        container.appendChild(img);
+      }
+      printArea.appendChild(container);
+    }
+
+    function renderGap5(src, count, className) {
+      const printArea = document.getElementById('print-area');
+      const container = document.createElement('div');
+      container.className = 'layout-gap-5';
       for (let i = 0; i < count; i++) {
         const img = document.createElement('img');
         img.src = src;
