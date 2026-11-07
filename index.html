@@ -24,16 +24,16 @@
       box-shadow: 0 0 15px rgba(0,0,0,0.15);
     }
 
-    /* Padding Variations Based on Selected Option */
+    /* Padding Adjustments per Option to keep 100% Photoshop scale */
     .pad-standard { padding: 6mm 6.2mm; }
-    .pad-5pic { padding: 6mm 2.2mm; }
+    .pad-4pic { padding: 6mm 3.5mm; }
+    .pad-5pic { padding: 6mm 3mm; }
 
-    /* Layout Alignment Rules */
+    /* Layout Rules with Exact 3.5mm Gap */
     .layout-center { display: flex; justify-content: center; align-items: flex-start; gap: 3.5mm; width: 100%; }
     .layout-left-to-right { display: flex; justify-content: flex-start; align-items: flex-start; gap: 3.5mm; width: 100%; flex-wrap: nowrap; }
-    .layout-gap-5 { display: flex; justify-content: flex-start; align-items: flex-start; gap: 1.2mm; width: 100%; flex-wrap: nowrap; }
 
-    /* Photoshop Exact Sizes (1.5 in x 1.9 in = 38.1mm x 48.26mm) */
+    /* Photoshop 1:1 Exact Sizes (1.5 in x 1.9 in = 38.1mm x 48.26mm) */
     .img-pp-normal { width: 38.1mm; height: 48.26mm; object-fit: cover; border: 2px solid #000; box-sizing: border-box; flex-shrink: 0; }
     .img-pp-rotated-exact { width: 48.26mm; height: 38.1mm; object-fit: cover; border: 2px solid #000; box-sizing: border-box; flex-shrink: 0; }
 
@@ -100,7 +100,6 @@
   <div id="print-area" class="pad-standard"></div>
 
   <script>
-    // Toggle custom input field
     document.getElementById('layoutPreset').addEventListener('change', function() {
       const customGroup = document.getElementById('customCountGroup');
       if (this.value === 'custom') {
@@ -123,9 +122,15 @@
       const printArea = document.getElementById('print-area');
       printArea.innerHTML = '';
       
-      // Set Print Area Padding
-      if (preset === '5' && photoType === 'single') {
-        printArea.className = 'pad-5pic';
+      // Auto-adjust page margin based on count for exact 1:1 scale
+      if (photoType === 'single') {
+        if (preset === '4') {
+          printArea.className = 'pad-4pic';
+        } else if (preset === '5') {
+          printArea.className = 'pad-5pic';
+        } else {
+          printArea.className = 'pad-standard';
+        }
       } else {
         printArea.className = 'pad-standard';
       }
@@ -157,7 +162,7 @@
             } else if (preset === '4') {
               renderLeftToRight(rotatedImgSrc, 4, 'img-pp-rotated-exact');
             } else if (preset === '5') {
-              renderGap5(imgSrc, 5, 'img-pp-normal');
+              renderLeftToRight(imgSrc, 5, 'img-pp-normal');
             } else {
               renderLeftToRight(imgSrc, ppCount, 'img-pp-normal');
             }
@@ -200,19 +205,6 @@
       const printArea = document.getElementById('print-area');
       const container = document.createElement('div');
       container.className = 'layout-left-to-right';
-      for (let i = 0; i < count; i++) {
-        const img = document.createElement('img');
-        img.src = src;
-        img.className = className;
-        container.appendChild(img);
-      }
-      printArea.appendChild(container);
-    }
-
-    function renderGap5(src, count, className) {
-      const printArea = document.getElementById('print-area');
-      const container = document.createElement('div');
-      container.className = 'layout-gap-5';
       for (let i = 0; i < count; i++) {
         const img = document.createElement('img');
         img.src = src;
