@@ -27,11 +27,14 @@
     /* Padding Adjustments */
     .pad-standard { padding: 4.5mm 6.2mm; }
     .pad-4pic { padding: 4.5mm 3.5mm; }
-    .pad-5pic { padding: 4.5mm 3mm; }
+    /* 5 Pic Layout Padding: Top 4.5mm, Left 4.5mm (Shifted right), Right 3mm */
+    .pad-5pic { padding: 4.5mm 3mm 4.5mm 4.5mm; }
 
-    /* Layout Rules with Exact 3.1mm Gap */
+    /* Layout Rules */
     .layout-center { display: flex; justify-content: center; align-items: flex-start; gap: 3.1mm; width: 100%; }
     .layout-left-to-right { display: flex; justify-content: flex-start; align-items: flex-start; gap: 3.1mm; width: 100%; flex-wrap: nowrap; }
+    /* 5 Pic Layout Gap Adjust to fit comfortably after shifting right */
+    .layout-gap-5-shift { display: flex; justify-content: flex-start; align-items: flex-start; gap: 2.3mm; width: 100%; flex-wrap: nowrap; }
 
     /* Photoshop 1:1 Exact Sizes (1.5 in x 1.9 in = 38.1mm x 48.26mm, Border: 1.5px) */
     .img-pp-normal { width: 38.1mm; height: 48.26mm; object-fit: cover; border: 1.5px solid #000; box-sizing: border-box; flex-shrink: 0; }
@@ -162,7 +165,7 @@
             } else if (preset === '4') {
               renderLeftToRight(rotatedImgSrc, 4, 'img-pp-rotated-exact');
             } else if (preset === '5') {
-              renderLeftToRight(imgSrc, 5, 'img-pp-normal');
+              renderShifted5(imgSrc, 5, 'img-pp-normal');
             } else {
               renderLeftToRight(imgSrc, ppCount, 'img-pp-normal');
             }
@@ -205,6 +208,19 @@
       const printArea = document.getElementById('print-area');
       const container = document.createElement('div');
       container.className = 'layout-left-to-right';
+      for (let i = 0; i < count; i++) {
+        const img = document.createElement('img');
+        img.src = src;
+        img.className = className;
+        container.appendChild(img);
+      }
+      printArea.appendChild(container);
+    }
+
+    function renderShifted5(src, count, className) {
+      const printArea = document.getElementById('print-area');
+      const container = document.createElement('div');
+      container.className = 'layout-gap-5-shift';
       for (let i = 0; i < count; i++) {
         const img = document.createElement('img');
         img.src = src;
